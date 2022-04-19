@@ -1,0 +1,44 @@
+on: [push, pull_request]
+name: Test
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        # 1.18.x
+        go-version: [1.17.x]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: Check out code
+      uses: actions/checkout@v3
+    - name: Run tests
+      run: go test -v
+    
+  build:  
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.17.x
+
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Run tests
+      run: |
+          go test -v ./... -covermode=count -coverprofile=coverage.out
+          go tool cover -func=coverage.out -o=coverage.out
+ 
+    
+    - name: Publish doc to go.dev packages
+      run: |
+        go get -u github.com/weakpixel/cty-function
+        # git pull
+        # export latest="$(git describe --tags `git rev-list --tags --max-count=1`)"
+        # curl https://proxy.golang.org/github.com/weakpixel/tfcli/@v/v0.0.3.info
