@@ -1,5 +1,7 @@
 package function
 
+// Original Code: https://github.com/hashicorp/terraform/blob/main/internal/lang/funcs/filesystem.go
+
 import (
 	"encoding/base64"
 	"fmt"
@@ -15,6 +17,10 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 )
+
+var sensitive = valueMark("sensitive")
+
+type valueMark string
 
 // MakeFileFunc constructs a function that takes a file path and returns the
 // contents of that file, either directly as a string (where valid UTF-8 is
@@ -500,7 +506,7 @@ func Pathexpand(path cty.Value) (cty.Value, error) {
 }
 
 func redactIfSensitive(value interface{}, markses ...cty.ValueMarks) string {
-	if Has(cty.DynamicVal.WithMarks(markses...), Sensitive) {
+	if cty.DynamicVal.WithMarks(markses...).HasMark(sensitive) {
 		return "(sensitive value)"
 	}
 	switch v := value.(type) {

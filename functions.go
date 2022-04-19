@@ -1,5 +1,7 @@
 package function
 
+// Original code: https://github.com/hashicorp/terraform/blob/main/internal/lang/functions.go
+
 import (
 	"fmt"
 
@@ -110,6 +112,7 @@ func Functions(basedir string, allowFS bool) map[string]function.Function {
 		"pathexpand": guardFS(allowFS, filesystem.PathExpandFunc),
 	}
 
+	// Original code: https://github.com/hashicorp/terraform/blob/main/internal/lang/functions.go
 	funcs["templatefile"] = MakeTemplateFileFunc(basedir, func() map[string]function.Function {
 		// The templatefile function prevents recursive calls to itself
 		// by copying this map and overwriting the "templatefile" entry.
